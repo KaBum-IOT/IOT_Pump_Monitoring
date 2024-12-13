@@ -62,36 +62,41 @@ Visto a necessidade do monitoramento dos dados do motor para garantir o correto 
 
 ```mermaid
     graph TD;
-        A(Login) --> B
-        B{Autorizado?} -->|SIM| C(Painel de dashboards)
-        C -->|Mudar de aba| D(Cadastro de sensores)
-        C -->|Mudar de aba| E(Histórico de dados)   
+
+    A(Login) --> F{Cadastrado?}
+    F --> |Sim| B(Home)
+    F --> |Não| A
+    A --> K{Cadastrar?}
+    K --> |Sim| C(Cadastro)
+    K --> |Não| A
+    C --> |Cadastro concluído| A
+    B --> D(Temperature Sensor)
+    B --> E(Vibration Sensor)
+    B --> G(Current Sensor)
+    B --> J(Reports)
+    B --> H(Logout) --> A   
 ```
 
 # Diagrama de Contexto
 
 ```mermaid
     graph TB
-        A[Motor trifásico]
-        B[Sensor de tempertura]
-        C[Protocolo HTTP]
-        D[ESP32]
-        B --> A
-        D --> B
-        D --> C
-        C --> D
-        subgraph Back-End
-        E[Python]
-        E --> C
-        C --> E
-        end
-        E --> F
-        H --> E
-        subgraph Front-End
-        F[Painel de dashboards]
-        H[Cadastro de sensores]
-        I[Histórico de dados]
-        end
-        I --> J[SGBD]
-        E --> I
+    subgraph External
+    A[Motor trifásico]
+    B[Sensor de Temperatura]
+    D[ESP32]
+    D --> K[Sensor de Vibração] --> A
+    D --> T[Sensor de Corrente] --> A
+    B --> A
+    D --> B
+    end
+    subgraph Back-End
+        E --> J[SGBD]
+        D --> E[C#]
+    end
+    E --> C[Services]
+    subgraph Front-End
+        
+       C[Services] --> F[Painel de dashboards]
+    end
 ```
