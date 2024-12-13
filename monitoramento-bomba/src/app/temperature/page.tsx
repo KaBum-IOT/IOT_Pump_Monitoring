@@ -1,21 +1,87 @@
+"use client";
+
+import React, { useState } from "react";
+import { format } from "date-fns";
 import SensorData from "@/components/sensor/SensorData";
 import Header from "@/components/layouts/Header";
 import Sidebar from "@/components/layouts/Sidebar";
+import { DatePicker } from "rsuite";
 
 export default function Data() {
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
+    const [formattedStartDate, setFormattedStartDate] = useState<string | null>(null);
+    const [formattedEndDate, setFormattedEndDate] = useState<string | null>(null);
+    const [reload, setReload] = useState(false);
+
+    const handleStartDateChange = (value: Date | null) => {
+        setStartDate(value);
+    };
+
+    const handleEndDateChange = (value: Date | null) => {
+        setEndDate(value);
+    };
+
+    const handleButtonClick = () => {
+        if (startDate && endDate) {
+            const formattedStartDate = format(startDate, "dd/MM/yyyy HH:mm:ss");
+            const formattedEndDate = format(endDate, "dd/MM/yyyy HH:mm:ss");
+    
+            // codifica a data usando encodeURIComponent
+            const encodedStartDate = encodeURIComponent(formattedStartDate);
+            const encodedEndDate = encodeURIComponent(formattedEndDate);
+    
+            setFormattedStartDate(encodedStartDate);
+            setFormattedEndDate(encodedEndDate);
+        } else {
+            setFormattedStartDate(null);
+            setFormattedEndDate(null);
+        }
+        setReload((prev) => !prev);
+    };
+
     return (
         <div className="flex h-screen overflow-hidden">
-            <Sidebar />
-            <div className="flex-1 flex flex-col">
-                <Header title="Temperatura" username="Username" />
-                <main className="flex-1 overflow-auto p-4">
-                    <div className="flex space-x-4">
+    <Sidebar />
+    <div className="flex-1 flex flex-col">
+        <Header title="Temperatura" username="Username" />
+        <main className="flex-1 overflow-auto p-4">
+            <div className="flex gap-4">
+                <div className="mb-4 flex flex-col gap-4">
+                    <label className="block text-black font-medium">Selecione as Datas:</label>
+                    <div className="flex gap-4">
                         <div className="flex-1">
-                            <SensorData type="Temperatura" />
+                            <label className="block mb-2 text-black font-medium">Data de Início:</label>
+                            <DatePicker
+                                format="dd/MM/yyyy HH:mm"
+                                className="text-black w-full border border-gray-300 rounded"
+                                onChange={handleStartDateChange}
+                            />
+                        </div>
+                        <div className="flex-1">
+                            <label className="block mb-2 text-black font-medium">Data de Término:</label>
+                            <DatePicker
+                                format="dd/MM/yyyy HH:mm"
+                                className="text-black w-full border border-gray-300 rounded"
+                                onChange={handleEndDateChange}
+                            />
                         </div>
                     </div>
-                </main>
+                </div>
+                <div className="self-end">
+                <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
+                    onClick={handleButtonClick}
+                >
+                    Filtrar
+                </button>
+                </div>
+                </div>
+            <div className="flex-1 mt-4">
+                <SensorData type="Temperatura" startDate={formattedStartDate} endDate={formattedEndDate} reload={reload} />
             </div>
-        </div>
+        </main>
+    </div>
+</div>
     );
 }

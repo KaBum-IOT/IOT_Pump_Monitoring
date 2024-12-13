@@ -1,6 +1,7 @@
  "use client"
 import React, { useState, useEffect } from "react";
 import { fetchSensorData } from "@/services/SensorService";
+import { fetchSensorData2 } from "@/services/SensorService2";
 import SensorChart from "../charts/SensorChart";
 import Card from "../cards/Card";
 import SensorTable from "@/components/tables/SensorTable";
@@ -65,24 +66,39 @@ interface Dataset {
 
 interface SensorProps {
     type: string;
+    startDate: string | null;
+    endDate: string | null;
+    reload: boolean;
 }
 
 
-const SensorData: React.FC<SensorProps> = ({ type }) => {
+const SensorData: React.FC<SensorProps> = ({ type, startDate, endDate, reload }) => {
 
     const [chartData, setChartData] = useState<SensorData[] | null>(null);
 
-    useEffect(() => {
-        const getSensorData = async () => {
-            try {
-                const data = await fetchSensorData();
-                setChartData(data);
-            } catch(error) {
-                console.error('Erro ao requisitar os dados')
+    const fetchData = async () => {
+        try {
+            let data;
+            if (startDate && endDate) {
+                console.log("Service2")
+                data = await fetchSensorData2(startDate, endDate);
+            } else {
+                console.log("Service1")
+                data = await fetchSensorData();
             }
-        };
-        getSensorData();
-    }, []);
+            setChartData(data);
+        } catch (error) {
+            console.error("Erro ao requisitar os dados:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchData(); // Reexecuta quando `reload` muda
+    }, [reload]); // Dependência no estado `reload`
+
+    if (!chartData) {
+        return <p>Carregando dados...</p>;
+    }
 
 
     let labels: string[] = [];
@@ -151,6 +167,11 @@ const SensorData: React.FC<SensorProps> = ({ type }) => {
     media /= datas.length;
     media2 /= datas.length;
     media3 /= datas.length;
+
+    media = parseFloat(media.toFixed(3));
+    media2 = parseFloat(media2.toFixed(3));
+    media3 = parseFloat(media3.toFixed(3));
+
     
     return (
         <div>
@@ -161,52 +182,67 @@ const SensorData: React.FC<SensorProps> = ({ type }) => {
                             <SensorChart labels={labels} datasets={datas} xlabel="Data e Hora" ylabel="Valor" type={type} />
                         </div>
                         <div className="flex-1">
-                            <SensorTable type={type} />
+                            <SensorTable type={type} startDate={startDate} endDate={endDate}/>
                         </div>
                     </div>
-                    <Card bgcolor={color}>
-                        <div className="flex items-center justify-center gap-8 text-center">
-                            <i className={icon}></i>
-                            <div className="flex flex-col items-center justify-center">
-                                <span className="text-3xl">{media}</span>
-                                <div className="text-xl pt-2">{mensagem}</div>
+                    <div className="flex w-full gap-4">
+                    <div className="flex-1">
+                        <Card bgcolor={color}>
+                            <div className="flex items-center justify-center gap-8 text-center">
+                                <i className={icon}></i>
+                                <div className="flex flex-col items-center justify-center">
+                                    <span className="text-3xl">{media}</span>
+                                    <div className="text-xl pt-2">{mensagem}</div>
+                                </div>
                             </div>
-                        </div>
-                    </Card>
+                        </Card>
+                    </div>
+                    <div className="flex-1">
+                        <Card bgcolor="bg-green-300 shadow-lg">
+                            <div className="flex items-center justify-center gap-8 text-center">
+                                <i className="pi pi-circle-on text-green-500 text-5xl px-4"></i>
+                                <div className="flex flex-col items-center justify-center">
+                                    <span className="text-3xl">Online</span>
+                                    <div className="text-xl pt-2">Sensor</div>
+                                </div>
+                            </div>
+                        </Card>
+                    </div>
+                </div>
                 </>
             ) : chartData && type == "total" ?  (
                 <div>
                     <div className="grid grid-cols-3 gap-4">
-                    <Card bgcolor={color}>
-                        <div className="flex items-center justify-center gap-8 text-center">
-                            <i className={icon}></i>
-                            <div className="flex flex-col items-center justify-center">
-                                <span className="text-3xl">{media}</span>
-                                <div className="text-xl pt-2">{mensagem}</div>
+                        <Card bgcolor={color}>
+                            <div className="flex items-center justify-center gap-8 text-center">
+                                <i className={icon}></i>
+                                <div className="flex flex-col items-center justify-center">
+                                    <span className="text-3xl">{media}</span>
+                                    <div className="text-xl pt-2">{mensagem}</div>
+                                </div>
                             </div>
-                        </div>
-                    </Card>
-                    <Card bgcolor={color2}>
-                        <div className="flex items-center justify-center gap-8 text-center">
-                            <i className={icon2}></i>
-                            <div className="flex flex-col items-center justify-center">
-                                <span className="text-3xl">{media2}</span>
-                                <div className="text-xl pt-2">{mensagem2}</div>
+                        </Card>
+                        <Card bgcolor={color2}>
+                            <div className="flex items-center justify-center gap-8 text-center">
+                                <i className={icon2}></i>
+                                <div className="flex flex-col items-center justify-center">
+                                    <span className="text-3xl">{media2}</span>
+                                    <div className="text-xl pt-2">{mensagem2}</div>
+                                </div>
                             </div>
-                        </div>
-                    </Card>
-                    <Card bgcolor={color3}>
-                        <div className="flex items-center justify-center gap-8 text-center">
-                            <i className={icon3}></i>
-                            <div className="flex flex-col items-center justify-center">
-                                <span className="text-3xl">{media3}</span>
-                                <div className="text-xl pt-2">{mensagem3}</div>
+                        </Card>
+                        <Card bgcolor={color3}>
+                            <div className="flex items-center justify-center gap-8 text-center">
+                                <i className={icon3}></i>
+                                <div className="flex flex-col items-center justify-center">
+                                    <span className="text-3xl">{media3}</span>
+                                    <div className="text-xl pt-2">{mensagem3}</div>
+                                </div>
                             </div>
-                        </div>
-                    </Card>
+                        </Card>
                   </div>
                   <br />
-                  <SensorTable type={type} />
+                  <SensorTable type={type} startDate={startDate} endDate={endDate}/>
                 </div>
                 
             ) : (

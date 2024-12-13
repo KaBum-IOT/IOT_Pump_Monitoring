@@ -5,6 +5,7 @@ import SensorData from "@/components/sensor/SensorData";
 import React, { useState, useEffect } from "react";
 import { postSensorData } from "@/services/PostSensorService";
 
+
 export default function Home() {
   const [formData, setFormData] = useState({
     date: "",
@@ -16,15 +17,26 @@ export default function Home() {
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault()
-      if (!formData.date || !formData.temperature || !formData.vibration || !formData.current)
-          setError("Todos os campos são obrigatórios")
-      else {
-          postSensorData({ date: formData.date, temperature: formData.temperature, vibration: formData.vibration, current: formData.current })
-          .then(data => console.log("Dados enviados com sucesso:", data))
-          .catch(error => console.error("Erro:", error));
-      }
-  }
+    e.preventDefault();
+  
+    if (!formData.date || !formData.temperature || !formData.vibration || !formData.current) {
+      setError("Todos os campos são obrigatórios");
+    } else {
+      // Convertendo valores para número antes de enviar
+      const sensorData = {
+        date: formData.date,
+        temperature: parseFloat(formData.temperature),
+        vibration: parseFloat(formData.vibration),
+        current: parseFloat(formData.current),
+      };
+  
+      postSensorData(sensorData)
+        .then(data => console.log("Dados enviados com sucesso:", data))
+        .catch(error => console.error("Erro:", error));
+      
+      setError("Enviado!");
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setFormData({...formData, [e.target.name]: e.target.value})
@@ -34,7 +46,7 @@ export default function Home() {
       <Sidebar />
       <div className="flex-1 flex flex-col">
         <Header title="Página Inicial" username="Username" />
-        <main className="p-4 flex-1 flex flex-col text-black overflow-auto mt-[64px]">
+        <main className="p-4 flex-1 flex flex-col text-black">
 
             {/* Boas-vindas */}
             <section className="bg-white p-6 rounded-lg shadow-md mb-4">
@@ -44,7 +56,7 @@ export default function Home() {
             </p>
           </section>
 
-          <SensorData type={"total"}/>
+          <SensorData type={"total"} startDate={null} endDate={null} reload={false}/>
 
           {/* Inputs para adicionar linha */}
           <section className="bg-white p-6 rounded-lg shadow-md mt-4">
@@ -69,7 +81,7 @@ export default function Home() {
                     Temperatura
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     name="temperature"
                     id="temperature"
                     value={formData.temperature}
@@ -82,7 +94,7 @@ export default function Home() {
                     Vibração
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     name="vibration"
                     id="vibration"
                     value={formData.vibration}
@@ -95,7 +107,7 @@ export default function Home() {
                     Corrente
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     name="current"
                     id="current"
                     value={formData.current}

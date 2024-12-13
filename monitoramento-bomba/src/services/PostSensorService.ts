@@ -9,7 +9,7 @@ interface SensorData {
 
 export const postSensorData = async (sensorData: SensorData): Promise<SensorData> => {
     try {
-        const response = await axios.post('http://localhost:5074/api/Users', {
+        const response = await axios.post('http://localhost:5074/api/Sensors', {
             date: sensorData.date,
             temperature: sensorData.temperature,
             vibration: sensorData.vibration,
