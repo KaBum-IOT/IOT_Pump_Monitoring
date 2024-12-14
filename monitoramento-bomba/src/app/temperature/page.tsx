@@ -42,41 +42,37 @@ export default function Data() {
 
     return (
         <div className="flex h-screen overflow-hidden">
-    <Sidebar />
-    <div className="flex-1 flex flex-col">
-        <Header title="Temperatura" username="Username" />
-        <main className="flex-1 overflow-auto p-4">
-            <div className="flex gap-4">
-                <div className="mb-4 flex flex-col gap-4">
-                    <label className="block text-black font-medium">Selecione as Datas:</label>
-                    <div className="flex gap-4">
-                        <div className="flex-1">
-                            <label className="block mb-2 text-black font-medium">Data de Início:</label>
-                            <DatePicker
-                                format="dd/MM/yyyy HH:mm"
-                                className="text-black w-full border border-gray-300 rounded"
-                                onChange={handleStartDateChange}
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <label className="block mb-2 text-black font-medium">Data de Término:</label>
-                            <DatePicker
-                                format="dd/MM/yyyy HH:mm"
-                                className="text-black w-full border border-gray-300 rounded"
-                                onChange={handleEndDateChange}
-                            />
+            <Sidebar />
+            <div className="flex-1 flex flex-col">
+                <Header title="Temperatura" username="Username" />
+                <main className="flex-1 overflow-auto p-4">
+                <div className="mb-4">
+                <label className="block mb-2 text-black">Selecione as Datas:</label>
+                        <div className="flex">
+                            <div className="flex-1">
+                                <label className="block mb-2 text-black">Data de Início:</label>
+                                <DatePicker
+                                    format="dd/MM/yyyy HH:mm"
+                                    className="text-black w-full"
+                                    onChange={handleStartDateChange}
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label className="block mb-2 text-black">Data de Término:</label>
+                                <DatePicker
+                                    format="dd/MM/yyyy HH:mm"
+                                    className="text-black w-full"
+                                    onChange={handleEndDateChange}
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className="self-end">
-                <button
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200"
-                    onClick={handleButtonClick}
-                >
-                    Filtrar
-                </button>
-                </div>
-                </div>
+                    <button
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                        onClick={handleButtonClick}
+                    >
+                        Filtrar
+                    </button>
             <div className="flex-1 mt-4">
                 <SensorData type="Temperatura" startDate={formattedStartDate} endDate={formattedEndDate} reload={reload} />
             </div>

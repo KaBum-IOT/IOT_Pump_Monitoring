@@ -80,10 +80,8 @@ const SensorData: React.FC<SensorProps> = ({ type, startDate, endDate, reload })
         try {
             let data;
             if (startDate && endDate) {
-                console.log("Service2")
                 data = await fetchSensorData2(startDate, endDate);
             } else {
-                console.log("Service1")
                 data = await fetchSensorData();
             }
             setChartData(data);

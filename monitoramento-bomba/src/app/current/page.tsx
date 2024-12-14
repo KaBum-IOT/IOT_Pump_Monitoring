@@ -72,7 +72,7 @@ export default function Data() {
                         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                         onClick={handleButtonClick}
                     >
-                        Enviar Datas
+                        Filtrar
                     </button>
                     <div className="flex-1 mt-4">
                         <SensorData type="Corrente" startDate={formattedStartDate} endDate={formattedEndDate} reload={reload} />
